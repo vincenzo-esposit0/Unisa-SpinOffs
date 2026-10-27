@@ -1,0 +1,50 @@
+[
+  {
+    "id": "4achem-s-r-l",
+    "name": "4ACHEM S.r.l.",
+    "category": "Chimica & Nuovi Materiali",
+    "incubatorStatus": "Incubazione",
+    "tagline": "Soluzioni avanzate per materiali e processi.",
+    "description": "Spin-off UNISA attivo nell'area chimica e nuovi materiali. Scheda sintetica per anteprima.",
+    "founded": null,
+    "department": "—",
+    "website": "",
+    "email": ""
+  },
+  {
+    "id": "ai4health-s-r-l",
+    "name": "AI4HEALTH S.r.l.",
+    "category": "Salute & Biomedicale",
+    "incubatorStatus": "Fuoriusciti",
+    "tagline": "AI per diagnostica e soluzioni cliniche.",
+    "description": "Spin-off UNISA area salute e biomedicale.",
+    "founded": null,
+    "department": "—",
+    "website": "",
+    "email": ""
+  },
+  {
+    "id": "aegister-spa-s-p-a",
+    "name": "AEGISTER SPA S.p.a.",
+    "category": "Informatica & Sistemi di Telecomunicazione",
+    "incubatorStatus": "Incubazione",
+    "tagline": "Sistemi digitali e piattaforme intelligenti.",
+    "description": "Spin-off UNISA in incubazione.",
+    "founded": null,
+    "department": "—",
+    "website": "",
+    "email": ""
+  },
+  {
+    "id": "ares-s-r-l",
+    "name": "ARES S.r.l.",
+    "category": "Energia & Sistemi di Alimentazione",
+    "incubatorStatus": "Incubazione",
+    "tagline": "Soluzioni per energia e power systems.",
+    "description": "Spin-off UNISA area energia.",
+    "founded": null,
+    "department": "—",
+    "website": "",
+    "email": ""
+  }
+]
