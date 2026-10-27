@@ -260,6 +260,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+      <PocBanner />
       <TopHeader />
 
       <Hero
@@ -421,6 +422,17 @@ function Logo({ inverted = false }: { inverted?: boolean }) {
         </span>
       </span>
     </a>
+  );
+}
+
+function PocBanner() {
+  return (
+    <div className="px-4 py-2 text-center text-sm font-medium" style={{ background: UNISA_GOLD, color: UNISA_BLUE_DARK }}>
+      <span className="mr-2 rounded-full bg-white/60 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide">
+        Proof of Concept
+      </span>
+      Questo sito è un prototipo dimostrativo e non è un canale ufficiale dell'{UNIVERSITY_NAME}.
+    </div>
   );
 }
 
@@ -938,8 +950,20 @@ function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-4 py-5 text-xs text-white/50">
-          © {new Date().getFullYear()} {UNIVERSITY_NAME}
+        <div className="max-w-6xl mx-auto px-4 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-white/50">
+          <span>© {new Date().getFullYear()} {UNIVERSITY_NAME}</span>
+          <span>
+            Realizzato da{" "}
+            <a
+              href="https://vincenzo-esposit0.github.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-white/80 hover:text-white underline-offset-4 hover:underline"
+            >
+              Vincenzo Esposito
+            </a>{" "}
+            come progetto di laboratorio
+          </span>
         </div>
       </div>
     </footer>
