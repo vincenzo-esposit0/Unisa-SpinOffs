@@ -1,6 +1,10 @@
 # UNISA Spin-off Showcase
 
-Progetto React + Vite + Tailwind per il catalogo degli spin-off UNISA.
+Proof of Concept per il restyling della pagina degli spin-off dell’Università degli Studi di Salerno: catalogo con ricerca per settore e stato di incubazione.
+
+**Demo:** https://vincenzo-esposit0.github.io/Unisa-SpinOffs/ · Stack: React + Vite + TypeScript + Tailwind CSS
+
+> Progetto indipendente a scopo dimostrativo: non è un sito ufficiale dell’Università degli Studi di Salerno. Nomi e loghi appartengono ai rispettivi titolari.
 
 ## Requisiti
 - Node.js 18+ (consigliato 20+)
