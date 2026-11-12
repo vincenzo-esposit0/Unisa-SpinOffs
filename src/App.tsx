@@ -955,7 +955,7 @@ function Footer() {
           <span>
             Realizzato da{" "}
             <a
-              href="https://vincenzo-esposit0.github.io/"
+              href="https://esposito-vincenzo.it/"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-white/80 hover:text-white underline-offset-4 hover:underline"

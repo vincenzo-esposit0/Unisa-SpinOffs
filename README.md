@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://vincenzo-esposit0.github.io/Unisa-SpinOffs/"><b>🌐 Live demo</b></a> ·
+  <a href="https://esposito-vincenzo.it/Unisa-SpinOffs/"><b>🌐 Live demo</b></a> ·
   <a href="#features"><b>✨ Features</b></a> ·
   <a href="#run-it-locally"><b>⚙️ Run locally</b></a>
 </p>
@@ -105,4 +105,4 @@ Copyright © 2026 Vincenzo Esposito. All rights reserved. This repository is pro
 
 ---
 
-<sub>Vincenzo Esposito · <a href="https://vincenzo-esposit0.github.io/">Website</a> · <a href="https://www.linkedin.com/in/vincenzo-e">LinkedIn</a></sub>
+<sub>Vincenzo Esposito · <a href="https://esposito-vincenzo.it/">Website</a> · <a href="https://www.linkedin.com/in/vincenzo-e">LinkedIn</a></sub>
