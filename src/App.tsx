@@ -1,4 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SplitText from "./components/reactbits/SplitText";
+import AnimatedContent from "./components/reactbits/AnimatedContent";
+import SpotlightCard from "./components/reactbits/SpotlightCard";
+import CountUp from "./components/CountUp";
+import { initSmoothScroll, lockScroll, scrollToId, scrollToTop } from "./lib/smoothScroll";
 
 /**
  * UNISA — Spin-off Showcase
@@ -145,10 +151,6 @@ function normalizeSpinoff(raw: any): Spinoff | null {
   };
 }
 
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
 function readSelectedId() {
   return new URLSearchParams(window.location.search).get("s");
 }
@@ -257,6 +259,13 @@ export default function App() {
     setStatus("All");
     setQuery("");
   };
+
+  useEffect(() => initSmoothScroll(), []);
+
+  // La pagina cambia altezza quando arriva il catalogo: ricalcola i trigger
+  useEffect(() => {
+    if (!loading) ScrollTrigger.refresh();
+  }, [loading]);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 antialiased">
@@ -385,11 +394,18 @@ export default function App() {
           ) : filtered.length === 0 ? (
             <EmptyState onReset={resetFilters} />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <AnimatedContent
+              key={`${category}|${status}|${query}|${sort}`}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+              distance={40}
+              duration={0.7}
+              stagger={0.08}
+              threshold={0.05}
+            >
               {filtered.map((s) => (
                 <SpinoffCard key={s.id} spinoff={s} onOpen={() => openSpinoff(s.id)} />
               ))}
-            </div>
+            </AnimatedContent>
           )}
         </div>
       </section>
@@ -411,7 +427,7 @@ const NAV = [
 
 function Logo({ inverted = false }: { inverted?: boolean }) {
   return (
-    <a href="#top" className="flex items-center gap-3" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+    <a href="#top" className="flex items-center gap-3" onClick={(e) => { e.preventDefault(); scrollToTop(); }}>
       <img src={UNIVERSITY_LOGO_URL} alt="" className="h-10 w-10 rounded-full bg-white object-contain" />
       <span className="leading-tight">
         <span className={"block text-sm font-semibold " + (inverted ? "text-white" : "text-slate-900")}>
@@ -519,8 +535,6 @@ function Hero({
   categories: number;
   loading: boolean;
 }) {
-  const fmt = (n: number) => (loading ? "–" : String(n));
-
   return (
     <section
       id="top"
@@ -539,16 +553,43 @@ function Hero({
           </span>
 
           <h1 className="mt-5 text-4xl md:text-6xl font-semibold tracking-tight leading-[1.05]">
-            Dall'eccellenza accademica{" "}
-            <span style={{ color: UNISA_GOLD }}>al mercato</span>
+            <SplitText
+              tag="span"
+              text="Dall'eccellenza accademica"
+              splitType="words"
+              mask
+              trigger="load"
+              textAlign="left"
+              delay={90}
+              duration={1}
+            />{" "}
+            <SplitText
+              tag="span"
+              text="al mercato"
+              splitType="chars"
+              effect="pop"
+              trigger="load"
+              textAlign="left"
+              delay={45}
+              duration={0.8}
+              color={UNISA_GOLD}
+            />
           </h1>
 
-          <p className="mt-5 max-w-xl text-base md:text-lg text-white/80 leading-relaxed">
-            L'Università degli Studi di Salerno valorizza le conoscenze e le tecnologie sviluppate
-            dai propri ricercatori sostenendo la nascita di imprese innovative: gli spin-off.
-          </p>
+          <AnimatedContent trigger="mount" delay={0.35} distance={24} duration={0.9}>
+            <p className="mt-5 max-w-xl text-base md:text-lg text-white/80 leading-relaxed">
+              L'Università degli Studi di Salerno valorizza le conoscenze e le tecnologie sviluppate
+              dai propri ricercatori sostenendo la nascita di imprese innovative: gli spin-off.
+            </p>
+          </AnimatedContent>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <AnimatedContent
+            trigger="mount"
+            delay={0.55}
+            distance={20}
+            stagger={0.1}
+            className="mt-8 flex flex-col sm:flex-row gap-3"
+          >
             <button
               onClick={() => scrollToId("catalogo")}
               className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg hover:brightness-105"
@@ -563,25 +604,29 @@ function Hero({
             >
               Come proporre uno spin-off
             </button>
-          </div>
+          </AnimatedContent>
         </div>
 
-        <dl className="grid grid-cols-2 gap-3">
-          <Stat value={fmt(total)} label="Spin-off nel catalogo" />
-          <Stat value={fmt(categories)} label="Settori" />
-          <Stat value={fmt(incubazione)} label="In incubazione" />
-          <Stat value={fmt(fuoriusciti)} label="Fuoriusciti" />
-        </dl>
+        <AnimatedContent trigger="mount" delay={0.4} distance={30} scale={0.96} stagger={0.1}>
+          <dl className="grid grid-cols-2 gap-3">
+            <Stat value={total} loading={loading} label="Spin-off nel catalogo" />
+            <Stat value={categories} loading={loading} label="Settori" />
+            <Stat value={incubazione} loading={loading} label="In incubazione" />
+            <Stat value={fuoriusciti} loading={loading} label="Fuoriusciti" />
+          </dl>
+        </AnimatedContent>
       </div>
     </section>
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+function Stat({ value, loading, label }: { value: number; loading: boolean; label: string }) {
   return (
     <div className="rounded-2xl bg-white/10 ring-1 ring-white/15 backdrop-blur p-5">
       <dt className="text-sm text-white/70">{label}</dt>
-      <dd className="mt-1 text-4xl font-semibold tabular-nums">{value}</dd>
+      <dd className="mt-1 text-4xl font-semibold tabular-nums">
+        {loading ? "–" : <CountUp to={value} />}
+      </dd>
     </div>
   );
 }
@@ -603,41 +648,49 @@ function CoverImage({ src, alt, className }: { src?: string; alt: string; classN
 
 function SpinoffCard({ spinoff, onOpen }: { spinoff: Spinoff; onOpen: () => void }) {
   return (
-    <button
-      onClick={onOpen}
-      className="group flex flex-col text-left rounded-2xl bg-white ring-1 ring-slate-200 shadow-sm overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+    <SpotlightCard
+      theme="light"
+      spotlightColor={UNISA_BLUE}
+      intensity={0.4}
+      spotlightSize={280}
+      className="!p-0 !rounded-2xl h-full transition-transform duration-300 hover:-translate-y-1"
     >
-      <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-        <CoverImage
-          src={spinoff.image}
-          alt={spinoff.name}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-        />
-        <span
-          className={
-            "absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-medium ring-1 " +
-            STATUS_BADGE[spinoff.incubatorStatus]
-          }
-        >
-          {STATUS_LABEL[spinoff.incubatorStatus]}
-        </span>
-      </div>
+      <button
+        onClick={onOpen}
+        className="group flex h-full w-full flex-col text-left rounded-2xl overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+      >
+        <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+          <CoverImage
+            src={spinoff.image}
+            alt={spinoff.name}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+          <span
+            className={
+              "absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-medium ring-1 " +
+              STATUS_BADGE[spinoff.incubatorStatus]
+            }
+          >
+            {STATUS_LABEL[spinoff.incubatorStatus]}
+          </span>
+        </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <span className={"self-start rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 " + categoryStyle(spinoff.category)[0]}>
-          {spinoff.category}
-        </span>
-        <h3 className="mt-3 text-lg font-semibold leading-snug">{spinoff.name}</h3>
-        <p className="mt-1 text-sm text-slate-500 line-clamp-2">{spinoff.tagline}</p>
-        <span
-          className="mt-auto pt-4 inline-flex items-center gap-1 text-sm font-medium"
-          style={{ color: UNISA_BLUE }}
-        >
-          Scopri di più
-          <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-0.5" />
-        </span>
-      </div>
-    </button>
+        <div className="flex flex-1 flex-col p-5">
+          <span className={"self-start rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 " + categoryStyle(spinoff.category)[0]}>
+            {spinoff.category}
+          </span>
+          <h3 className="mt-3 text-lg font-semibold leading-snug">{spinoff.name}</h3>
+          <p className="mt-1 text-sm text-slate-500 line-clamp-2">{spinoff.tagline}</p>
+          <span
+            className="mt-auto pt-4 inline-flex items-center gap-1 text-sm font-medium"
+            style={{ color: UNISA_BLUE }}
+          >
+            Scopri di più
+            <ArrowIcon className="h-4 w-4 transition group-hover:translate-x-0.5" />
+          </span>
+        </div>
+      </button>
+    </SpotlightCard>
   );
 }
 
@@ -649,9 +702,11 @@ function DetailModal({ spinoff, onClose }: { spinoff: Spinoff; onClose: () => vo
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    lockScroll(true);
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      lockScroll(false);
     };
   }, [onClose]);
 
@@ -673,7 +728,7 @@ function DetailModal({ spinoff, onClose }: { spinoff: Spinoff; onClose: () => vo
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full sm:max-w-3xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white shadow-2xl">
+      <div data-lenis-prevent className="relative w-full sm:max-w-3xl max-h-[92vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl bg-white shadow-2xl">
         <button
           onClick={onClose}
           className="absolute right-3 top-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 ring-1 ring-slate-200 text-slate-600 hover:text-slate-900"
@@ -814,7 +869,7 @@ function ProcessSection() {
   return (
     <section id="percorso" className="scroll-mt-16 bg-white border-y border-slate-200">
       <div className="max-w-6xl mx-auto px-4 py-20">
-        <div className="max-w-2xl">
+        <AnimatedContent className="max-w-2xl" distance={30}>
           <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: UNISA_BLUE }}>
             Il percorso
           </p>
@@ -825,11 +880,23 @@ function ProcessSection() {
             Gli spin-off sono società fondate da personale dell'Ateneo per trasformare i risultati della
             ricerca in prodotti e servizi per il mercato.
           </p>
-        </div>
+        </AnimatedContent>
 
-        <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <AnimatedContent
+          role="list"
+          className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          distance={40}
+          stagger={0.12}
+        >
           {STEPS.map((s, i) => (
-            <li key={s.title} className="rounded-2xl bg-slate-50 ring-1 ring-slate-200 p-6">
+            <SpotlightCard
+              key={s.title}
+              role="listitem"
+              theme="light"
+              spotlightColor={UNISA_GOLD}
+              intensity={0.6}
+              className="!p-6 !rounded-2xl"
+            >
               <span
                 className="inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold"
                 style={{ background: UNISA_GOLD, color: UNISA_BLUE_DARK }}
@@ -838,32 +905,34 @@ function ProcessSection() {
               </span>
               <h3 className="mt-4 font-semibold">{s.title}</h3>
               <p className="mt-2 text-sm text-slate-600 leading-relaxed">{s.text}</p>
-            </li>
+            </SpotlightCard>
           ))}
-        </ol>
+        </AnimatedContent>
 
-        <div
-          className="mt-10 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 text-white"
-          style={{ background: `linear-gradient(135deg, ${UNISA_BLUE_DARK}, ${UNISA_BLUE})` }}
-        >
-          <div>
-            <h3 className="text-xl md:text-2xl font-semibold">Hai un progetto da proporre?</h3>
-            <p className="mt-2 text-white/80 max-w-xl">
-              Consulta il portale di Ateneo per il regolamento e la modulistica, oppure contatta l'Ufficio
-              Trasferimento Tecnologico e Terza Missione.
-            </p>
-          </div>
-          <a
-            href={LINKS.unisa}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg hover:brightness-105"
-            style={{ background: UNISA_GOLD, color: UNISA_BLUE_DARK }}
+        <AnimatedContent distance={30} scale={0.97}>
+          <div
+            className="mt-10 rounded-3xl p-8 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 text-white"
+            style={{ background: `linear-gradient(135deg, ${UNISA_BLUE_DARK}, ${UNISA_BLUE})` }}
           >
-            Vai al portale UNISA
-            <ExternalIcon className="h-4 w-4" />
-          </a>
-        </div>
+            <div>
+              <h3 className="text-xl md:text-2xl font-semibold">Hai un progetto da proporre?</h3>
+              <p className="mt-2 text-white/80 max-w-xl">
+                Consulta il portale di Ateneo per il regolamento e la modulistica, oppure contatta l'Ufficio
+                Trasferimento Tecnologico e Terza Missione.
+              </p>
+            </div>
+            <a
+              href={LINKS.unisa}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold shadow-lg hover:brightness-105"
+              style={{ background: UNISA_GOLD, color: UNISA_BLUE_DARK }}
+            >
+              Vai al portale UNISA
+              <ExternalIcon className="h-4 w-4" />
+            </a>
+          </div>
+        </AnimatedContent>
       </div>
     </section>
   );
@@ -872,7 +941,7 @@ function ProcessSection() {
 function ContactSection() {
   return (
     <section id="contatti" className="scroll-mt-16 max-w-6xl mx-auto px-4 py-20">
-      <div className="grid gap-10 lg:grid-cols-2 items-start">
+      <AnimatedContent className="grid gap-10 lg:grid-cols-2 items-start" distance={30} stagger={0.15}>
         <div>
           <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: UNISA_BLUE }}>
             Contatti
@@ -892,7 +961,7 @@ function ContactSection() {
           <ContactRow title="Instagram" detail="@unisalerno" href={LINKS.instagram} />
           <ContactRow title="X" detail="@unisalerno" href={LINKS.x} />
         </div>
-      </div>
+      </AnimatedContent>
     </section>
   );
 }

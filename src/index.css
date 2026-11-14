@@ -6,10 +6,6 @@
   color-scheme: light;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   margin: 0;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
