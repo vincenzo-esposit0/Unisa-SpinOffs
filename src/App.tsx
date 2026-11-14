@@ -23,6 +23,7 @@ const UNIVERSITY_NAME = "Università degli Studi di Salerno";
 const PLATFORM_NAME = "Spin-off UNISA";
 
 const UNIVERSITY_LOGO_URL = `${import.meta.env.BASE_URL}logo_unisa.png`;
+const UNIVERSITY_LOGO_AVIF = `${import.meta.env.BASE_URL}logo_unisa.avif`;
 const DATA_URL = `${import.meta.env.BASE_URL}unisa-spinoffs.json`;
 
 const LINKS = {
@@ -105,7 +106,19 @@ const STATUS_LABEL: Record<IncubatorStatus, string> = {
 };
 
 const unsplash = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?q=80&w=1200&auto=format&fit=crop`;
+  `https://images.unsplash.com/photo-${id}?q=70&w=800&auto=format&fit=crop`;
+
+const IMAGE_WIDTHS = [400, 800, 1200, 1600];
+
+// Per le foto Unsplash genera le varianti di larghezza, così il browser scarica solo quella necessaria
+function imageSrcSet(src: string) {
+  if (!src.startsWith("https://images.unsplash.com/")) return undefined;
+  return IMAGE_WIDTHS.map((w) => {
+    const url = new URL(src);
+    url.searchParams.set("w", String(w));
+    return `${url} ${w}w`;
+  }).join(", ");
+}
 
 const CATEGORY_IMAGE: Record<string, string> = {
   "Chimica & Nuovi Materiali": unsplash("1532187863486-abf9dbad1b69"),
@@ -428,7 +441,10 @@ const NAV = [
 function Logo({ inverted = false }: { inverted?: boolean }) {
   return (
     <a href="#top" className="flex items-center gap-3" onClick={(e) => { e.preventDefault(); scrollToTop(); }}>
-      <img src={UNIVERSITY_LOGO_URL} alt="" className="h-10 w-10 rounded-full bg-white object-contain" />
+      <picture className="shrink-0">
+        <source srcSet={UNIVERSITY_LOGO_AVIF} type="image/avif" />
+        <img src={UNIVERSITY_LOGO_URL} alt="" width={40} height={40} className="h-10 w-10 rounded-full bg-white object-contain" />
+      </picture>
       <span className="leading-tight">
         <span className={"block text-sm font-semibold " + (inverted ? "text-white" : "text-slate-900")}>
           {PLATFORM_NAME}
@@ -631,7 +647,7 @@ function Stat({ value, loading, label }: { value: number; loading: boolean; labe
   );
 }
 
-function CoverImage({ src, alt, className }: { src?: string; alt: string; className: string }) {
+function CoverImage({ src, alt, className, sizes }: { src?: string; alt: string; className: string; sizes: string }) {
   const [failed, setFailed] = useState(false);
   if (!src || failed) {
     return (
@@ -643,7 +659,18 @@ function CoverImage({ src, alt, className }: { src?: string; alt: string; classN
       </div>
     );
   }
-  return <img src={src} alt="" loading="lazy" className={className} onError={() => setFailed(true)} />;
+  return (
+    <img
+      src={src}
+      srcSet={imageSrcSet(src)}
+      sizes={sizes}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      className={className}
+      onError={() => setFailed(true)}
+    />
+  );
 }
 
 function SpinoffCard({ spinoff, onOpen }: { spinoff: Spinoff; onOpen: () => void }) {
@@ -663,6 +690,7 @@ function SpinoffCard({ spinoff, onOpen }: { spinoff: Spinoff; onOpen: () => void
           <CoverImage
             src={spinoff.image}
             alt={spinoff.name}
+            sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
           <span
@@ -739,7 +767,12 @@ function DetailModal({ spinoff, onClose }: { spinoff: Spinoff; onClose: () => vo
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr]">
-          <CoverImage src={spinoff.image} alt={spinoff.name} className="h-52 md:h-full w-full object-cover bg-slate-100" />
+          <CoverImage
+            src={spinoff.image}
+            alt={spinoff.name}
+            sizes="(min-width: 768px) 700px, 100vw"
+            className="h-52 md:h-full w-full object-cover bg-slate-100"
+          />
 
           <div className="p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2">
